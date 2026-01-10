@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManagement", "GymManagement\GymManagement.csproj", "{5039119D-0CFA-45C6-9A17-6AD212857956}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5039119D-0CFA-45C6-9A17-6AD212857956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5039119D-0CFA-45C6-9A17-6AD212857956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5039119D-0CFA-45C6-9A17-6AD212857956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5039119D-0CFA-45C6-9A17-6AD212857956}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
