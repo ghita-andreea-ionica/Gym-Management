@@ -420,3 +420,182 @@ namespace GymManagement
         public override string GetUserType() => "Admin";
     } 
 }
+public class UserData
+    {
+        public string Password { get; set; }
+        public string FullName { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string UserType { get; set; }
+        public string MembershipStatus { get; set; }
+        public DateTime? MembershipExpiry { get; set; }
+        public string CurrentSubscription { get; set; }
+        public List<DateTime> Visits { get; set; }
+        public string CurrentZone { get; set; }
+        public string PreferredRoom { get; set; }
+        public List<string> ReservedClasses { get; set; }
+        public string AccessLevel { get; set; }
+    }
+    public class FileManager
+    {
+        private readonly string _filename;
+        public FileManager(string filename = "users.json")
+        {
+            _filename = filename;
+            EnsureFileExists();
+        }
+        private void EnsureFileExists()
+        {
+            if (!File.Exists(_filename))
+            {
+                File.WriteAllText(_filename, "{}");
+            }
+        }
+        public Dictionary<string, UserData> LoadData()
+        {
+            string json = File.ReadAllText(_filename);
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            return JsonSerializer.Deserialize<Dictionary<string, UserData>>(json, options)
+                   ?? new Dictionary<string, UserData>();
+        }
+        public void SaveData(Dictionary<string, UserData> data)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            string json = JsonSerializer.Serialize(data, options);
+            File.WriteAllText(_filename, json);
+        }
+    }
+    public class UserRepository
+    {
+        private readonly FileManager _fileManager;
+        public UserRepository(FileManager fileManager)
+        {
+            _fileManager = fileManager;
+        }
+        public (bool success, string message) AddUser(User user)
+        {
+            var users = _fileManager.LoadData();
+
+            if (users.ContainsKey(user.Username))
+                return (false, "Username-ul există deja!");
+
+            users[user.Username] = ConvertToUserData(user);
+            _fileManager.SaveData(users);
+            return (true, "Utilizator adăugat cu succes!");
+        }
+        public User GetUser(string username)
+        {
+            var users = _fileManager.LoadData();
+            if (!users.ContainsKey(username))
+                return null;
+            return ConvertToUser(username, users[username]);
+        }
+        public (bool success, string message) UpdateUser(User user)
+        {
+            var users = _fileManager.LoadData();
+            if (!users.ContainsKey(user.Username))
+                return (false, "Utilizatorul nu există!");
+
+            users[user.Username] = ConvertToUserData(user);
+            _fileManager.SaveData(users);
+            return (true, "Utilizator actualizat cu succes!");
+        }
+        public Dictionary<string, UserData> GetAllUsers()
+        {
+            return _fileManager.LoadData();
+        }
+        private UserData ConvertToUserData(User user)
+        {
+            var data = new UserData
+            {
+                Password = user.GetPasswordHash(),
+                FullName = user.FullName,
+                CreatedAt = user.CreatedAt,
+                UserType = user.GetUserType()
+            };
+            if (user is Client client)
+            {
+                data.MembershipStatus = client.MembershipStatus;
+                data.MembershipExpiry = client.MembershipExpiry;
+                data.CurrentSubscription = client.CurrentSubscription?.ToString();
+                data.Visits = client.Visits;
+                data.CurrentZone = client.CurrentZone;
+                data.PreferredRoom = client.PreferredRoom;
+                data.ReservedClasses = client.ReservedClasses;
+            }
+            else if (user is Admin admin)
+            {
+                data.AccessLevel = admin.AccessLevel;
+            }
+            return data;
+        }
+        private User ConvertToUser(string username, UserData data)
+        {
+            User user;
+
+            if (data.UserType == "Admin")
+            {
+                user = new Admin
+                {
+                    Username = username,
+                    FullName = data.FullName,
+                    CreatedAt = data.CreatedAt,
+                    AccessLevel = data.AccessLevel ?? "standard"
+                };
+            }
+            else
+            {
+                user = new Client
+                {
+                    Username = username,
+                    FullName = data.FullName,
+                    CreatedAt = data.CreatedAt,
+                    MembershipStatus = data.MembershipStatus ?? "inactiv",
+                    MembershipExpiry = data.MembershipExpiry,
+                    CurrentSubscription = !string.IsNullOrEmpty(data.CurrentSubscription) 
+                        ? (SubscriptionType)Enum.Parse(typeof(SubscriptionType), data.CurrentSubscription)
+                        : (SubscriptionType?)null,
+                    Visits = data.Visits ?? new List<DateTime>(),
+                    CurrentZone = data.CurrentZone,
+                    PreferredRoom = data.PreferredRoom,
+                    ReservedClasses = data.ReservedClasses ?? new List<string>()
+                };
+            }
+
+            user.SetPasswordHash(data.Password);
+            return user;
+        }
+    }
+    public class AuthenticationService
+    {
+        private readonly UserRepository _userRepository;
+        public AuthenticationService(UserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
+        public (bool success, string message) RegisterClient(string username, string password,string fullname)
+        { var client = new Client(username, password, fullname);
+            return _userRepository.AddUser(client);
+        }
+        public (bool success, string message) RegisterAdmin(string username, string password, string email, string fullname, string phone = "", string accessLevel = "standard")
+        {
+            var admin = new Admin(username, password, fullname, accessLevel);
+            return _userRepository.AddUser(admin);
+        }
+        public (bool success, User user, string message) Login(string username, string password)
+        {
+            var user = _userRepository.GetUser(username);
+
+            if (user == null)
+                return (false, null, "Username sau parolă incorectă!");
+
+            if (!user.VerifyPassword(password))
+                return (false, null, "Username sau parolă incorectă!");
+
+            return (true, user, $"Bun venit, {user.FullName}!");
+        }
+    }
+    
