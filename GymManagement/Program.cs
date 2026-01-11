@@ -597,4 +597,14 @@ namespace GymManagement
             return (true, user, $"Bun venit, {user.FullName}!");
         }
     } 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    sdcdsas
 }
