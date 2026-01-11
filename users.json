@@ -1,30 +1,53 @@
 {
-  "anndreea23": {
-    "Password": "bd972cc4f15d8c175061381ba53c0b85cfb33c09637e55c2cf97721fbd1b3645",
-    "FullName": "Ghita Andreea",
-    "CreatedAt": "2026-01-10T22:54:17.8167924+02:00",
-    "UserType": "Client",
-    "MembershipStatus": "inactiv",
-    "MembershipExpiry": null,
-    "CurrentSubscription": null,
-    "Visits": [],
-    "CurrentZone": null,
-    "PreferredRoom": null,
-    "ReservedClasses": [],
-    "AccessLevel": null
+  "Users": {
+    "ioana": {
+      "Password": "858e2b14533db9791a67003491d9ca28e7421ce4d20d3f78119a8c3df4ee6d99",
+      "FullName": "Ioana Maria",
+      "CreatedAt": "2026-01-11T22:56:13.8031433+02:00",
+      "UserType": "Client",
+      "MembershipStatus": "activ",
+      "MembershipExpiry": "2026-02-10T23:00:51.5632289+02:00",
+      "CurrentSubscription": "Lunar",
+      "Visits": [],
+      "CurrentZone": null,
+      "PreferredRoom": null,
+      "ReservedClasses": [
+        "d8bb6282"
+      ],
+      "AccessLevel": null
+    },
+    "Admin": {
+      "Password": "c1c224b03cd9bc7b6a86d77f5dace40191766c485cd55dc48caf9ac873335d6f",
+      "FullName": "Andreea",
+      "CreatedAt": "2026-01-11T22:57:44.3316959+02:00",
+      "UserType": "Admin",
+      "MembershipStatus": null,
+      "MembershipExpiry": null,
+      "CurrentSubscription": null,
+      "Visits": null,
+      "CurrentZone": null,
+      "PreferredRoom": null,
+      "ReservedClasses": null,
+      "AccessLevel": "standard"
+    }
   },
-  "ionica12": {
-    "Password": "7316e07be4be8beff11283006bc04633988b443f1b94cf7430424d68d2514bb4",
-    "FullName": "Andreea Ionica",
-    "CreatedAt": "2026-01-11T20:17:43.327606+02:00",
-    "UserType": "Client",
-    "MembershipStatus": "activ",
-    "MembershipExpiry": "2027-01-11T20:19:21.1191841+02:00",
-    "CurrentSubscription": "Anual",
-    "Visits": [],
-    "CurrentZone": null,
-    "PreferredRoom": null,
-    "ReservedClasses": [],
-    "AccessLevel": null
+  "RoomClasses": {
+    "Sala1": [
+      {
+        "Id": "d8bb6282",
+        "Type": "Fitness",
+        "TrainerName": "er",
+        "TrainerSpecialization": "ws",
+        "DurationMinutes": 50,
+        "MaxCapacity": 12,
+        "Participants": [
+          "ioana"
+        ],
+        "StartTime": "2026-05-12T00:00:00",
+        "RoomLocation": "Sala Fitness Central"
+      }
+    ],
+    "Sala2": [],
+    "Sala3": []
   }
 }
