@@ -440,6 +440,22 @@ namespace GymManagement
         }
 
         public override string GetUserType() => "Client";
+        
+        public string CancelMembership()
+        {
+            if (MembershipStatus == "inactiv")
+                return "Nu ai un abonament activ de anulat!";
+        
+            var oldStatus = MembershipStatus;
+            var oldType = CurrentSubscription;
+            
+            MembershipStatus = "anulat";
+            MembershipExpiry = DateTime.Now;
+            CurrentSubscription = null;
+        
+            return $"Abonamentul a fost anulat cu succes!\nPoți reactiva oricând un abonament nou.";
+        }
+        
     }
 
     public class Admin : User
@@ -486,7 +502,29 @@ namespace GymManagement
         public List<string> ReservedClasses { get; set; }
         public string AccessLevel { get; set; }
     }
-
+    public class GymData
+    {
+        public Dictionary<string, UserData> Users { get; set; }
+        public Dictionary<string, List<ClassSessionData>> RoomClasses { get; set; }
+    
+        public GymData()
+        {
+            Users = new Dictionary<string, UserData>();
+            RoomClasses = new Dictionary<string, List<ClassSessionData>>();
+        }
+    }
+    public class ClassSessionData
+    {
+        public string Id { get; set; }
+        public string Type { get; set; }
+        public string TrainerName { get; set; }
+        public string TrainerSpecialization { get; set; }
+        public int DurationMinutes { get; set; }
+        public int MaxCapacity { get; set; }
+        public List<string> Participants { get; set; }
+        public DateTime StartTime { get; set; }
+        public string RoomLocation { get; set; }
+    }
     public class FileManager
     {
         private readonly string _filename;
@@ -501,19 +539,18 @@ namespace GymManagement
         {
             if (!File.Exists(_filename))
             {
-                File.WriteAllText(_filename, "{}");
+                var emptyData = new GymData();
+                SaveGymData(emptyData);
             }
         }
-
-        public Dictionary<string, UserData> LoadData()
+        public GymData LoadGymData()
         {
             string json = File.ReadAllText(_filename);
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<Dictionary<string, UserData>>(json, options)
-                   ?? new Dictionary<string, UserData>();
+            return JsonSerializer.Deserialize<GymData>(json, options) ?? new GymData();
         }
 
-        public void SaveData(Dictionary<string, UserData> data)
+        public void SaveGymData(GymData data)
         {
             var options = new JsonSerializerOptions
             {
@@ -522,6 +559,17 @@ namespace GymManagement
             };
             string json = JsonSerializer.Serialize(data, options);
             File.WriteAllText(_filename, json);
+        }
+        public Dictionary<string, UserData> LoadData()
+        {
+            return LoadGymData().Users;
+        }
+
+        public void SaveData(Dictionary<string, UserData> users)
+        {
+            var gymData = LoadGymData();
+            gymData.Users = users;
+            SaveGymData(gymData);
         }
     }
 
@@ -543,6 +591,7 @@ namespace GymManagement
 
             users[user.Username] = ConvertToUserData(user);
             _fileManager.SaveData(users);
+            Console.WriteLine($"[DEBUG] User {user.Username} actualizat. Status: {(user is Client c ? c.MembershipStatus : "N/A")}");
             return (true, "Utilizator adăugat cu succes!");
         }
 
@@ -588,6 +637,8 @@ namespace GymManagement
                 data.CurrentZone = client.CurrentZone;
                 data.PreferredRoom = client.PreferredRoom;
                 data.ReservedClasses = client.ReservedClasses;
+                
+                Console.WriteLine($"[DEBUG] Convertire la UserData: Status={data.MembershipStatus}, Subscription={data.CurrentSubscription}");
             }
             else if (user is Admin admin)
             {
@@ -679,7 +730,74 @@ namespace GymManagement
             _currentUser = null;
             Rooms = new Dictionary<string, FitnessRoom>();
             InitializeRooms();
+            LoadClassesFromFile();
         }
+        private void LoadClassesFromFile()
+        {
+            var gymData = _fileManager.LoadGymData();
+        
+            foreach (var kvp in gymData.RoomClasses)
+            {
+                string roomKey = kvp.Key;
+                if (Rooms.ContainsKey(roomKey))
+                {
+                    foreach (var classData in kvp.Value)
+                    {
+                        var trainer = new Trainer(classData.TrainerName, classData.TrainerSpecialization);
+                        var classType = (ClassType)Enum.Parse(typeof(ClassType), classData.Type);
+                    
+                        var classSession = new ClassSession(
+                            classType, 
+                            trainer, 
+                            classData.DurationMinutes, 
+                            classData.MaxCapacity, 
+                            classData.StartTime, 
+                            classData.RoomLocation
+                        );
+                    
+                        classSession.Id = classData.Id;
+                        foreach (var participant in classData.Participants)
+                        {
+                            classSession.Participants.Add(participant);
+                        }
+                    
+                        Rooms[roomKey].Classes.Add(classSession);
+                    }
+                }
+            }
+        }
+        private void SaveClassesToFile()
+        {
+            var gymData = _fileManager.LoadGymData();
+            gymData.RoomClasses = new Dictionary<string, List<ClassSessionData>>();
+        
+            foreach (var kvp in Rooms)
+            {
+                string roomKey = kvp.Key;
+                var classesList = new List<ClassSessionData>();
+            
+                foreach (var classSession in kvp.Value.Classes)
+                {
+                    classesList.Add(new ClassSessionData
+                    {
+                        Id = classSession.Id,
+                        Type = classSession.Type.ToString(),
+                        TrainerName = classSession.Trainer.Name,
+                        TrainerSpecialization = classSession.Trainer.Specialization,
+                        DurationMinutes = classSession.DurationMinutes,
+                        MaxCapacity = classSession.MaxCapacity,
+                        Participants = classSession.Participants,
+                        StartTime = classSession.StartTime,
+                        RoomLocation = classSession.RoomLocation
+                    });
+                }
+            
+                gymData.RoomClasses[roomKey] = classesList;
+            }
+        
+            _fileManager.SaveGymData(gymData);
+        }
+
         private void InitializeRooms()
         {
             Rooms.Add("Sala1", new FitnessRoom("Sala Fitness Central", "Str. Victoriei nr. 10"));
@@ -785,7 +903,7 @@ namespace GymManagement
             var trainer = new Trainer(trainerName, trainerSpec);
             var classSession = new ClassSession(type, trainer, duration, maxCapacity, startTime, Rooms[roomKey].Name);
             Rooms[roomKey].AddClass(classSession);
-
+            SaveClassesToFile();
             return $"Clasa {type} adăugată cu succes! ID: {classSession.Id}";
         }
         public string RemoveClass(string roomKey, string classId)
@@ -797,7 +915,10 @@ namespace GymManagement
                 return "Sala nu există!";
 
             if (Rooms[roomKey].RemoveClass(classId))
+            {
+                SaveClassesToFile();
                 return "Clasa ștearsă cu succes!";
+            }
 
             return "Clasa nu a fost găsită!";
         }
@@ -877,6 +998,7 @@ namespace GymManagement
             {
                 client.ReservedClasses.Add(classId);
                 _userRepository.UpdateUser(client);
+                SaveClassesToFile();
                 return $"Rezervare confirmată pentru clasa {classSession.Type} pe {classSession.StartTime:yyyy-MM-dd HH:mm}!";
             }
 
@@ -898,10 +1020,28 @@ namespace GymManagement
             {
                 client.ReservedClasses.Remove(classId);
                 _userRepository.UpdateUser(client);
+                SaveClassesToFile();
                 return "Rezervare anulată cu succes!";
             }
 
             return "Nu ai o rezervare pentru această clasă!";
+        }
+        public string CancelMembership()
+        {
+            if (_currentUser is Client client)
+            {
+                string result = client.CancelMembership();
+                var (success, message) = _userRepository.UpdateUser(client);
+        
+                if (!success)
+                {
+                    return $"Eroare la salvare: {message}";
+                }
+                _currentUser = _userRepository.GetUser(client.Username);
+        
+                return result;
+            }
+            return "Doar clienții pot anula abonamente!";
         }
         public void DisplayMyReservations()
         {
@@ -938,8 +1078,255 @@ namespace GymManagement
             }
         }
     } 
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string usersFile = Path.Combine(desktopPath, "users.json");
+            Console.WriteLine($"Fișierul va fi salvat în: {usersFile}\n");
+            var gym = new GymManagementSystem(usersFile);
+            Console.WriteLine("GYM MANAGEMENT");
+
+            while (true)
+            {
+                Console.WriteLine("MENIU PRINCIPAL");
+                Console.WriteLine(" 1. Înregistrare Client              ");
+                Console.WriteLine(" 2. Înregistrare Admin               ");
+                Console.WriteLine(" 3. Login                            ");
+                Console.WriteLine(" 4. Info utilizator curent           ");
+                Console.WriteLine(" 5. Vizualizare tipuri abonamente    ");
+                Console.WriteLine(" 6. Activare abonament               ");
+                Console.WriteLine(" 6a. Renunțare la abonament          "); 
+                Console.WriteLine(" 7. Vizualizare săli fitness         ");
+                Console.WriteLine(" 8. Check-in în zonă                 ");
+                Console.WriteLine(" 9. Check-out din zonă               ");
+                Console.WriteLine(" 10. Înregistrare vizită             ");
+                Console.WriteLine(" --- CLASE ---                       ");
+                Console.WriteLine(" 11. Vizualizare toate clasele       ");
+                Console.WriteLine(" 12. Rezervare clasă (Client)        ");
+                Console.WriteLine(" 13. Anulare rezervare (Client)      ");
+                Console.WriteLine(" 14. Rezervările mele (Client)       ");
+                Console.WriteLine(" --- ADMIN ---                       ");
+                Console.WriteLine(" 15. Adăugare clasă (Admin)          ");
+                Console.WriteLine(" 16. Ștergere clasă (Admin)          ");
+                Console.WriteLine(" 17. Statistici (Admin)              ");
+                Console.WriteLine(" --- GENERAL ---                     ");
+                Console.WriteLine(" 18. Logout                          ");
+                Console.WriteLine(" 19. Ieșire                          ");
+                Console.Write("\nAlege opțiunea: ");
+                string choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        Console.WriteLine("\n--- ÎNREGISTRARE CLIENT ---");
+                        Console.Write("Username: ");
+                        string username = Console.ReadLine();
+                        Console.Write("Parolă: ");
+                        string password = Console.ReadLine();
+                        Console.Write("Nume complet: ");
+                        string fullName = Console.ReadLine();
+
+                        var (success1, message1) = gym.RegisterClient(username, password, fullName);
+                        Console.WriteLine($"\n{message1}");
+                        break;
+
+                    case "2":
+                        Console.WriteLine("\n--- ÎNREGISTRARE ADMIN ---");
+                        Console.Write("Username: ");
+                        string adminUser = Console.ReadLine();
+                        Console.Write("Parolă: ");
+                        string adminPass = Console.ReadLine();
+                        Console.Write("Nume complet: ");
+                        string adminName = Console.ReadLine();
+
+                        var (success2, message2) = gym.RegisterAdmin(adminUser, adminPass, adminName);
+                        Console.WriteLine($"\n{message2}");
+                        break;
+
+                    case "3":
+                        Console.WriteLine("\n--- LOGIN ---");
+                        Console.Write("Username: ");
+                        string loginUsername = Console.ReadLine();
+                        Console.Write("Parolă: ");
+                        string loginPassword = Console.ReadLine();
+
+                        var (success3, message3) = gym.Login(loginUsername, loginPassword);
+                        Console.WriteLine($"\n{message3}");
+                        break;
+
+                    case "4":
+                        var info = gym.GetCurrentUserInfo();
+                        if (info != null)
+                        {
+                            Console.WriteLine("\n--- INFORMAȚII UTILIZATOR ---");
+                            foreach (var kvp in info)
+                            {
+                                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nNu ești autentificat!");
+                        }
+                        break;
+
+                    case "5":
+                        gym.DisplaySubscriptionOptions();
+                        break;
+
+                    case "6":
+                        Console.WriteLine("\n--- ACTIVARE ABONAMENT ---");
+                        Console.WriteLine("1. Lunar (150 RON/lună)");
+                        Console.WriteLine("2. Anual (1500 RON/an)");
+                        Console.Write("Alege tipul abonamentului: ");
+                        string subChoice = Console.ReadLine();
+
+                        SubscriptionType type = subChoice == "1" ? SubscriptionType.Lunar : SubscriptionType.Anual;
+                        string result6 = gym.ActivateMembership(type);
+                        Console.WriteLine($"\n{result6}");
+                        break;
+                    
+                    case "6a":
+                        Console.WriteLine("\n--- RENUNȚARE LA ABONAMENT ---");
+                        Console.WriteLine("ATENȚIE: Această acțiune va anula abonamentul tău curent!");
+                        Console.Write("Confirmă (da/nu): ");
+                        string confirm = Console.ReadLine();
     
-    
-    
-    
+                        if (confirm.ToLower() == "da")
+                        {
+                            string resultCancel = gym.CancelMembership();
+                            Console.WriteLine($"\n{resultCancel}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nOperațiune anulată.");
+                        }
+                        break;
+
+                    case "7":
+                        gym.DisplayAllRooms();
+                        break;
+
+                    case "8":
+                        Console.WriteLine("\n--- CHECK-IN ÎN ZONĂ ---");
+                        Console.WriteLine("Săli: Sala1 | Sala2 | Sala3");
+                        Console.Write("Alege sala: ");
+                        string roomKey8 = Console.ReadLine();
+                        Console.WriteLine("Zone: Cardio | Forta | Tractiuni");
+                        Console.Write("Alege zona: ");
+                        string zone8 = Console.ReadLine();
+
+                        string result8 = gym.CheckInToZone(roomKey8, zone8);
+                        Console.WriteLine($"\n{result8}");
+                        break;
+
+                    case "9":
+                        Console.WriteLine("\n--- CHECK-OUT DIN ZONĂ ---");
+                        Console.Write("Sala (Sala1/Sala2/Sala3): ");
+                        string roomKey9 = Console.ReadLine();
+
+                        string result9 = gym.CheckOutFromZone(roomKey9);
+                        Console.WriteLine($"\n{result9}");
+                        break;
+
+                    case "10":
+                        string result10 = gym.AddVisit();
+                        Console.WriteLine($"\n{result10}");
+                        break;
+
+                    case "11":
+                        gym.DisplayAllClasses();
+                        break;
+
+                    case "12":
+                        Console.WriteLine("\n--- REZERVARE CLASĂ ---");
+                        gym.DisplayAllClasses();
+                        Console.Write("\nSala (Sala1/Sala2/Sala3): ");
+                        string roomKey12 = Console.ReadLine();
+                        Console.Write("ID Clasă: ");
+                        string classId12 = Console.ReadLine();
+
+                        string result12 = gym.ReserveClass(roomKey12, classId12);
+                        Console.WriteLine($"\n{result12}");
+                        break;
+
+                    case "13":
+                        Console.WriteLine("\n--- ANULARE REZERVARE ---");
+                        gym.DisplayMyReservations();
+                        Console.Write("\nSala (Sala1/Sala2/Sala3): ");
+                        string roomKey13 = Console.ReadLine();
+                        Console.Write("ID Clasă: ");
+                        string classId13 = Console.ReadLine();
+
+                        string result13 = gym.CancelReservation(roomKey13, classId13);
+                        Console.WriteLine($"\n{result13}");
+                        break;
+
+                    case "14":
+                        gym.DisplayMyReservations();
+                        break;
+
+                    case "15":
+                        Console.WriteLine("\n--- ADĂUGARE CLASĂ (ADMIN) ---");
+                        Console.Write("Sala (Sala1/Sala2/Sala3): ");
+                        string roomKey15 = Console.ReadLine();
+                        Console.WriteLine("Tip clasă: 1.Fitness | 2.Pilates | 3.Yoga");
+                        Console.Write("Alege: ");
+                        string typeChoice = Console.ReadLine();
+                        ClassType classType = typeChoice == "1" ? ClassType.Fitness : 
+                                             typeChoice == "2" ? ClassType.Pilates : ClassType.Yoga;
+                        
+                        Console.Write("Nume antrenor: ");
+                        string trainerName = Console.ReadLine();
+                        Console.Write("Specializare antrenor: ");
+                        string trainerSpec = Console.ReadLine();
+                        Console.Write("Email antrenor: ");
+                        string trainerEmail = Console.ReadLine();
+                        Console.Write("Telefon antrenor: ");
+                        string trainerPhone = Console.ReadLine();
+                        Console.Write("Durată (minute): ");
+                        int duration = int.Parse(Console.ReadLine());
+                        Console.Write("Capacitate maximă: ");
+                        int maxCap = int.Parse(Console.ReadLine());
+                        Console.Write("Data și ora (yyyy-MM-dd HH:mm): ");
+                        DateTime startTime = DateTime.Parse(Console.ReadLine());
+
+                        string result15 = gym.AddClass(roomKey15, classType, trainerName, trainerSpec, 
+                                                       trainerEmail, trainerPhone, duration, maxCap, startTime);
+                        Console.WriteLine($"\n{result15}");
+                        break;
+
+                    case "16":
+                        Console.WriteLine("\n--- ȘTERGERE CLASĂ (ADMIN) ---");
+                        Console.Write("Sala (Sala1/Sala2/Sala3): ");
+                        string roomKey16 = Console.ReadLine();
+                        Console.Write("ID Clasă: ");
+                        string classId16 = Console.ReadLine();
+
+                        string result16 = gym.RemoveClass(roomKey16, classId16);
+                        Console.WriteLine($"\n{result16}");
+                        break;
+
+                    case "17":
+                        gym.DisplayAdminStatistics();
+                        break;
+
+                    case "18":
+                        string result18 = gym.Logout();
+                        Console.WriteLine($"\n{result18}");
+                        break;
+
+                    case "19":
+                        Console.WriteLine("\nLa revedere!");
+                        return;
+
+                    default:
+                        Console.WriteLine("\nOpțiune invalidă!");
+                        break;
+                }
+            }
+        }
+    } 
 }
