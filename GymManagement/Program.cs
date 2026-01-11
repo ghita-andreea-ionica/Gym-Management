@@ -419,7 +419,8 @@ namespace GymManagement
         }
         public override string GetUserType() => "Admin";
     } 
-    public class UserData
+}
+public class UserData
     {
         public string Password { get; set; }
         public string FullName { get; set; }
@@ -596,15 +597,5 @@ namespace GymManagement
 
             return (true, user, $"Bun venit, {user.FullName}!");
         }
-    } 
+    }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    //sdcdsas
-}
