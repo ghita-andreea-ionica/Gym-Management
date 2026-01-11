@@ -12,13 +12,3 @@ D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.AssemblyInfoI
 D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.AssemblyInfo.cs
 D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.csproj.CoreCompileInputs.cache
 D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.sourcelink.json
-D:\GYM\GymManagement\GymManagement\bin\Debug\net10.0\GymManagement.exe
-D:\GYM\GymManagement\GymManagement\bin\Debug\net10.0\GymManagement.deps.json
-D:\GYM\GymManagement\GymManagement\bin\Debug\net10.0\GymManagement.runtimeconfig.json
-D:\GYM\GymManagement\GymManagement\bin\Debug\net10.0\GymManagement.dll
-D:\GYM\GymManagement\GymManagement\bin\Debug\net10.0\GymManagement.pdb
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.dll
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\refint\GymManagement.dll
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.pdb
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.genruntimeconfig.cache
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\ref\GymManagement.dll

@@ -1,0 +1,30 @@
+{
+  "anndreea23": {
+    "Password": "bd972cc4f15d8c175061381ba53c0b85cfb33c09637e55c2cf97721fbd1b3645",
+    "FullName": "Ghita Andreea",
+    "CreatedAt": "2026-01-10T22:54:17.8167924+02:00",
+    "UserType": "Client",
+    "MembershipStatus": "inactiv",
+    "MembershipExpiry": null,
+    "CurrentSubscription": null,
+    "Visits": [],
+    "CurrentZone": null,
+    "PreferredRoom": null,
+    "ReservedClasses": [],
+    "AccessLevel": null
+  },
+  "ionica12": {
+    "Password": "7316e07be4be8beff11283006bc04633988b443f1b94cf7430424d68d2514bb4",
+    "FullName": "Andreea Ionica",
+    "CreatedAt": "2026-01-11T20:17:43.327606+02:00",
+    "UserType": "Client",
+    "MembershipStatus": "activ",
+    "MembershipExpiry": "2027-01-11T20:19:21.1191841+02:00",
+    "CurrentSubscription": "Anual",
+    "Visits": [],
+    "CurrentZone": null,
+    "PreferredRoom": null,
+    "ReservedClasses": [],
+    "AccessLevel": null
+  }
+}
