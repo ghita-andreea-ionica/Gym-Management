@@ -7,3 +7,8 @@ D:/GYM/GymManagement/GymManagement/obj/Debug/net10.0/GymManagement.csproj.CoreCo
 /Users/nicolettagheablau/RiderProjects/Gym Data/GymManagement/obj/Debug/net10.0/GymManagement.AssemblyInfo.cs
 /Users/nicolettagheablau/RiderProjects/Gym Data/GymManagement/obj/Debug/net10.0/GymManagement.csproj.CoreCompileInputs.cache
 /Users/nicolettagheablau/RiderProjects/Gym Data/GymManagement/obj/Debug/net10.0/GymManagement.sourcelink.json
+D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.GeneratedMSBuildEditorConfig.editorconfig
+D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.AssemblyInfoInputs.cache
+D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.AssemblyInfo.cs
+D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.csproj.CoreCompileInputs.cache
+D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.sourcelink.json
