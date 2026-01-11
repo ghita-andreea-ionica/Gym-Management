@@ -7,8 +7,19 @@ D:/GYM/GymManagement/GymManagement/obj/Debug/net10.0/GymManagement.csproj.CoreCo
 /Users/nicolettagheablau/RiderProjects/Gym Data/GymManagement/obj/Debug/net10.0/GymManagement.AssemblyInfo.cs
 /Users/nicolettagheablau/RiderProjects/Gym Data/GymManagement/obj/Debug/net10.0/GymManagement.csproj.CoreCompileInputs.cache
 /Users/nicolettagheablau/RiderProjects/Gym Data/GymManagement/obj/Debug/net10.0/GymManagement.sourcelink.json
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.GeneratedMSBuildEditorConfig.editorconfig
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.AssemblyInfoInputs.cache
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.AssemblyInfo.cs
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.csproj.CoreCompileInputs.cache
-D:\GYM\GymManagement\GymManagement\obj\Debug\net10.0\GymManagement.sourcelink.json
+D:/GYM/GymManagement/GymManagement/obj/Debug/net10.0/GymManagement.sourcelink.json
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/bin/Debug/net10.0/GymManagement
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/bin/Debug/net10.0/GymManagement.deps.json
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/bin/Debug/net10.0/GymManagement.runtimeconfig.json
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/bin/Debug/net10.0/GymManagement.dll
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/bin/Debug/net10.0/GymManagement.pdb
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.GeneratedMSBuildEditorConfig.editorconfig
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.AssemblyInfoInputs.cache
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.AssemblyInfo.cs
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.csproj.CoreCompileInputs.cache
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.sourcelink.json
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.dll
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/refint/GymManagement.dll
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.pdb
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/GymManagement.genruntimeconfig.cache
+/Users/nicolettagheablau/RiderProjects/Gym-Management/actua/Actualizare_2/GymManagement/Actualizare-3/GymManagement/obj/Debug/net10.0/ref/GymManagement.dll

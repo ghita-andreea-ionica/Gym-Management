@@ -939,7 +939,239 @@ namespace GymManagement
         }
     } 
     
-    
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string usersFile = Path.Combine(desktopPath, "users.json");
+            Console.WriteLine($"Fișierul va fi salvat în: {usersFile}\n");
+            var gym = new GymManagementSystem(usersFile);
+            Console.WriteLine("GYM MANAGEMENT");
+
+            while (true)
+            {
+                Console.WriteLine("MENIU PRINCIPAL");
+                Console.WriteLine(" 1. Înregistrare Client              ");
+                Console.WriteLine(" 2. Înregistrare Admin               ");
+                Console.WriteLine(" 3. Login                            ");
+                Console.WriteLine(" 4. Info utilizator curent           ");
+                Console.WriteLine(" 5. Vizualizare tipuri abonamente    ");
+                Console.WriteLine(" 6. Activare abonament               ");
+                Console.WriteLine(" 7. Vizualizare săli fitness         ");
+                Console.WriteLine(" 8. Check-in în zonă                 ");
+                Console.WriteLine(" 9. Check-out din zonă               ");
+                Console.WriteLine(" 10. Înregistrare vizită             ");
+                Console.WriteLine(" --- CLASE ---                       ");
+                Console.WriteLine(" 11. Vizualizare toate clasele       ");
+                Console.WriteLine(" 12. Rezervare clasă (Client)        ");
+                Console.WriteLine(" 13. Anulare rezervare (Client)      ");
+                Console.WriteLine(" 14. Rezervările mele (Client)       ");
+                Console.WriteLine(" --- ADMIN ---                       ");
+                Console.WriteLine(" 15. Adăugare clasă (Admin)          ");
+                Console.WriteLine(" 16. Ștergere clasă (Admin)          ");
+                Console.WriteLine(" 17. Statistici (Admin)              ");
+                Console.WriteLine(" --- GENERAL ---                     ");
+                Console.WriteLine(" 18. Logout                          ");
+                Console.WriteLine(" 19. Ieșire                          ");
+                Console.Write("\nAlege opțiunea: ");
+                string choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        Console.WriteLine("\n--- ÎNREGISTRARE CLIENT ---");
+                        Console.Write("Username: ");
+                        string username = Console.ReadLine();
+                        Console.Write("Parolă: ");
+                        string password = Console.ReadLine();
+                        Console.Write("Nume complet: ");
+                        string fullName = Console.ReadLine();
+
+                        var (success1, message1) = gym.RegisterClient(username, password, fullName);
+                        Console.WriteLine($"\n{message1}");
+                        break;
+
+                    case "2":
+                        Console.WriteLine("\n--- ÎNREGISTRARE ADMIN ---");
+                        Console.Write("Username: ");
+                        string adminUser = Console.ReadLine();
+                        Console.Write("Parolă: ");
+                        string adminPass = Console.ReadLine();
+                        Console.Write("Nume complet: ");
+                        string adminName = Console.ReadLine();
+
+                        var (success2, message2) = gym.RegisterAdmin(adminUser, adminPass, adminName);
+                        Console.WriteLine($"\n{message2}");
+                        break;
+
+                    case "3":
+                        Console.WriteLine("\n--- LOGIN ---");
+                        Console.Write("Username: ");
+                        string loginUsername = Console.ReadLine();
+                        Console.Write("Parolă: ");
+                        string loginPassword = Console.ReadLine();
+
+                        var (success3, message3) = gym.Login(loginUsername, loginPassword);
+                        Console.WriteLine($"\n{message3}");
+                        break;
+
+                    case "4":
+                        var info = gym.GetCurrentUserInfo();
+                        if (info != null)
+                        {
+                            Console.WriteLine("\n--- INFORMAȚII UTILIZATOR ---");
+                            foreach (var kvp in info)
+                            {
+                                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nNu ești autentificat!");
+                        }
+                        break;
+
+                    case "5":
+                        gym.DisplaySubscriptionOptions();
+                        break;
+
+                    case "6":
+                        Console.WriteLine("\n--- ACTIVARE ABONAMENT ---");
+                        Console.WriteLine("1. Lunar (150 RON/lună)");
+                        Console.WriteLine("2. Anual (1500 RON/an)");
+                        Console.Write("Alege tipul abonamentului: ");
+                        string subChoice = Console.ReadLine();
+
+                        SubscriptionType type = subChoice == "1" ? SubscriptionType.Lunar : SubscriptionType.Anual;
+                        string result6 = gym.ActivateMembership(type);
+                        Console.WriteLine($"\n{result6}");
+                        break;
+
+                    case "7":
+                        gym.DisplayAllRooms();
+                        break;
+
+                    case "8":
+                        Console.WriteLine("\n--- CHECK-IN ÎN ZONĂ ---");
+                        Console.WriteLine("Săli: Sala1 | Sala2 | Sala3");
+                        Console.Write("Alege sala: ");
+                        string roomKey8 = Console.ReadLine();
+                        Console.WriteLine("Zone: Cardio | Forta | Tractiuni");
+                        Console.Write("Alege zona: ");
+                        string zone8 = Console.ReadLine();
+
+                        string result8 = gym.CheckInToZone(roomKey8, zone8);
+                        Console.WriteLine($"\n{result8}");
+                        break;
+
+                    case "9":
+                        Console.WriteLine("\n--- CHECK-OUT DIN ZONĂ ---");
+                        Console.Write("Sala (Sala1/Sala2/Sala3): ");
+                        string roomKey9 = Console.ReadLine();
+
+                        string result9 = gym.CheckOutFromZone(roomKey9);
+                        Console.WriteLine($"\n{result9}");
+                        break;
+
+                    case "10":
+                        string result10 = gym.AddVisit();
+                        Console.WriteLine($"\n{result10}");
+                        break;
+
+                    case "11":
+                        gym.DisplayAllClasses();
+                        break;
+
+                    case "12":
+                        Console.WriteLine("\n--- REZERVARE CLASĂ ---");
+                        gym.DisplayAllClasses();
+                        Console.Write("\nSala (Sala1/Sala2/Sala3): ");
+                        string roomKey12 = Console.ReadLine();
+                        Console.Write("ID Clasă: ");
+                        string classId12 = Console.ReadLine();
+
+                        string result12 = gym.ReserveClass(roomKey12, classId12);
+                        Console.WriteLine($"\n{result12}");
+                        break;
+
+                    case "13":
+                        Console.WriteLine("\n--- ANULARE REZERVARE ---");
+                        gym.DisplayMyReservations();
+                        Console.Write("\nSala (Sala1/Sala2/Sala3): ");
+                        string roomKey13 = Console.ReadLine();
+                        Console.Write("ID Clasă: ");
+                        string classId13 = Console.ReadLine();
+
+                        string result13 = gym.CancelReservation(roomKey13, classId13);
+                        Console.WriteLine($"\n{result13}");
+                        break;
+
+                    case "14":
+                        gym.DisplayMyReservations();
+                        break;
+
+                    case "15":
+                        Console.WriteLine("\n--- ADĂUGARE CLASĂ (ADMIN) ---");
+                        Console.Write("Sala (Sala1/Sala2/Sala3): ");
+                        string roomKey15 = Console.ReadLine();
+                        Console.WriteLine("Tip clasă: 1.Fitness | 2.Pilates | 3.Yoga");
+                        Console.Write("Alege: ");
+                        string typeChoice = Console.ReadLine();
+                        ClassType classType = typeChoice == "1" ? ClassType.Fitness : 
+                                             typeChoice == "2" ? ClassType.Pilates : ClassType.Yoga;
+                        
+                        Console.Write("Nume antrenor: ");
+                        string trainerName = Console.ReadLine();
+                        Console.Write("Specializare antrenor: ");
+                        string trainerSpec = Console.ReadLine();
+                        Console.Write("Email antrenor: ");
+                        string trainerEmail = Console.ReadLine();
+                        Console.Write("Telefon antrenor: ");
+                        string trainerPhone = Console.ReadLine();
+                        Console.Write("Durată (minute): ");
+                        int duration = int.Parse(Console.ReadLine());
+                        Console.Write("Capacitate maximă: ");
+                        int maxCap = int.Parse(Console.ReadLine());
+                        Console.Write("Data și ora (yyyy-MM-dd HH:mm): ");
+                        DateTime startTime = DateTime.Parse(Console.ReadLine());
+
+                        string result15 = gym.AddClass(roomKey15, classType, trainerName, trainerSpec, 
+                                                       trainerEmail, trainerPhone, duration, maxCap, startTime);
+                        Console.WriteLine($"\n{result15}");
+                        break;
+
+                    case "16":
+                        Console.WriteLine("\n--- ȘTERGERE CLASĂ (ADMIN) ---");
+                        Console.Write("Sala (Sala1/Sala2/Sala3): ");
+                        string roomKey16 = Console.ReadLine();
+                        Console.Write("ID Clasă: ");
+                        string classId16 = Console.ReadLine();
+
+                        string result16 = gym.RemoveClass(roomKey16, classId16);
+                        Console.WriteLine($"\n{result16}");
+                        break;
+
+                    case "17":
+                        gym.DisplayAdminStatistics();
+                        break;
+
+                    case "18":
+                        string result18 = gym.Logout();
+                        Console.WriteLine($"\n{result18}");
+                        break;
+
+                    case "19":
+                        Console.WriteLine("\nLa revedere!");
+                        return;
+
+                    default:
+                        Console.WriteLine("\nOpțiune invalidă!");
+                        break;
+                }
+            }
+        }
+    }
     
     
 }
